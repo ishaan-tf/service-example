@@ -1,0 +1,22 @@
+name: Deploy to TrueFoundry
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  TFY_HOST: https://app.devtest.truefoundry.tech
+  TFY_API_KEY: ${{ secrets.TFY_API_KEY }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install servicefoundry
+        run: pip install servicefoundry
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Deploy
+        run: |
+          sfy patch-application --application_fqn=tfy-ctl-euwe1-devtest:akash-ws:cicd-test --patch='{"image": {"type": "build", "build_source": {"type": "local", "project_root_path": "./", "local_build": true}, "build_spec": {"type": "dockerfile", "dockerfile_path": "./Dockerfile", "build_context_path": "./"}}}'
