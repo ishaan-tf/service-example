@@ -1,5 +1,6 @@
 import http.server
 import random
+import io
 
 from prometheus_client import Counter, exposition
 
@@ -10,12 +11,14 @@ REQUESTS_COUNT = Counter(COUNTER_NAME, 'Count', ['endpoint'])
 class RequestsHandler(exposition.MetricsHandler):
 
     def do_POST(self):
+        content_length = int(self.headers['Content-Length'])  # Get the size of data
+        post_data = self.rfile.read(content_length)  # Read the data
         print("POST request")
-        print(self.body)
+        print(post_data.decode('utf-8'))  # Decode the data to a string
         self.send_response(200)
         self.send_header('Content-type', 'text/plain')
         self.end_headers()
-        self.wfile.write('POST request'.encode())
+        self.wfile.write('POST request received'.encode())
 
     def do_GET(self):
         if self.path not in ('/foo', '/bar', '/metrics'):
@@ -44,11 +47,11 @@ class RequestsHandler(exposition.MetricsHandler):
 
 
 if __name__ == '__main__':
-    cpu = "a" * random.randint(1,5) * 1000000
+    cpu = "a" * random.randint(1, 5) * 1000000
     for path in ('/foo', '/bar'):
         REQUESTS_COUNT.labels(endpoint=path)
 
     server_address = ('', 8080)
     httpd = http.server.HTTPServer(server_address, RequestsHandler)
-    httpd.serve_forever()
     print('Server started')
+    httpd.serve_forever()
