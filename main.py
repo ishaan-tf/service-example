@@ -9,6 +9,14 @@ REQUESTS_COUNT = Counter(COUNTER_NAME, 'Count', ['endpoint'])
 
 class RequestsHandler(exposition.MetricsHandler):
 
+    def do_POST(self):
+        print("POST request")
+        print(self.body)
+        self.send_response(200)
+        self.send_header('Content-type', 'text/plain')
+        self.end_headers()
+        self.wfile.write('POST request'.encode())
+
     def do_GET(self):
         if self.path not in ('/foo', '/bar', '/metrics'):
             self.send_response(404)
