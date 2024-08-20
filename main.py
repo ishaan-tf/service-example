@@ -15,7 +15,7 @@ class RequestsHandler(exposition.MetricsHandler):
         post_data = self.rfile.read(content_length)  # Read the data
         print("POST request")
         print(post_data.decode('utf-8'))  # Decode the data to a string
-        self.send_response(200)
+        self.send_response(500)
         self.send_header('Content-type', 'text/plain')
         self.end_headers()
         self.wfile.write('POST request received'.encode())
